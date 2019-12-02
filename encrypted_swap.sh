@@ -6,6 +6,12 @@ then
     exit 1
 fi
 
+if [ -z "$(swapon --show)" ]
+then
+    echo "Swapping is disabled, no need to encrypt"
+    exit 0
+fi
+
 # Disable any existing swap
 swapoff -a
 
@@ -17,7 +23,7 @@ fi
 
 # Add cryptswap encrypted device to /etc/crypttab
 {
-    grep -v "\s/swapfile\s" /etc/crypttab
+    grep -v "\\s/swapfile\\s" /etc/crypttab
     echo "cryptswap /swapfile /dev/urandom swap,offset=1024,cipher=aes-xts-plain64,size=256"
 } > /tmp/newcrypttab
 
@@ -28,7 +34,7 @@ cryptdisks_start cryptswap
 
 # Replace all swap entries in /etc/fstab
 {
-    grep -v "\sswap\s" /etc/fstab
+    grep -v "\\sswap\\s" /etc/fstab
     echo "#/swapfile                                 none            swap    sw              0       0"
     echo "/dev/mapper/cryptswap none swap sw 0 0"
 } > /tmp/newfstab
