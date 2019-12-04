@@ -6,6 +6,12 @@ then
     exit 1
 fi
 
+if mount | grep -q "\\son /home\\s";
+then
+    echo "/home is expected to be a directory instead of a mounted volume"
+    exit 1
+fi
+
 data_file=/encrypted_home
 homedir_size=100   # GB to allocate for /home
 mount_dir=/home
